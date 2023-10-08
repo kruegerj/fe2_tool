@@ -69,9 +69,6 @@ func main() {
 	database := client.Database(config.MongoDB.Database)
 	collection := database.Collection(config.MongoDB.Collection)
 
-	// Projektion erstellen, um die gewünschten Felder auszuwählen
-	//projection := options.Find().SetProjection(map[string]interface{}{"name": 1, "unit.$[].name": 1})
-
 	// Abfrage erstellen und die gewünschte Projektion verwenden
 	// Schreibgeschützte Abfrage durchführen
 	cursor, err := collection.Find(context.TODO(), bson.M{})
