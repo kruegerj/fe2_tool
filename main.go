@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -25,10 +26,23 @@ type Config struct {
 type User struct {
 	Name string `bson:"name"`
 	Unit []struct {
-		Name string `bson:"name"`
-		Type string `bson:"type"`
-		Code string `bson:"code"`
+		Name     string   `bson:"name"`
+		Type     string   `bson:"type"`
+		Code     string   `bson:"code"`
+		Settings Settings `bson:"settings"`
 	} `bson:"units"`
+}
+
+type Settings struct {
+	AutoCloseAfterTime          bool `bson:"autoCloseAfterTime"`
+	AutoCloseTimeInHours        int  `bson:"autoCloseTimeInHours"`
+	AutoCloseStatus2            bool `bson:"autoCloseStatus2"`
+	AutoDeleteApager            bool `bson:"autoDeleteApager"`
+	AutoDeleteApagerTimeInHours int  `bson:"autoDeleteApagerTimeInHours"`
+	Disabled                    bool `bson:"disabled"`
+	UseFeedback                 bool `bson:"useFeedback"`
+	Tracing                     bool `bson:"tracing"`
+	// Weitere Untereinträge hier hinzufügen
 }
 
 func main() {
@@ -97,7 +111,7 @@ func main() {
 	writer.UseCRLF = true // Zeilenumbruch für Windows
 
 	// Überschriftenzeile schreiben
-	writer.Write([]string{"User", "Name", "Code", "Type"})
+	writer.Write([]string{"User", "Name", "Code", "Type", "AutoDeleteApagerTimeInHours"})
 	// Ergebnisse verarbeiten
 	var users []User
 	for cursor.Next(context.TODO()) {
@@ -113,7 +127,8 @@ func main() {
 	for _, user := range users {
 		//log.Infof("Name: %s", user.Name)
 		for _, unit := range user.Unit {
-			writer.Write([]string{user.Name, unit.Name, unit.Code, unit.Type})
+			autoDeleteApagerTimeStr := strconv.Itoa(unit.Settings.AutoDeleteApagerTimeInHours)
+			writer.Write([]string{user.Name, unit.Name, unit.Code, unit.Type, autoDeleteApagerTimeStr})
 			log.Infof("User Name: %s;Unit Name: %s;Unit Code: %s", user.Name, unit.Name, unit.Code)
 		}
 	}
