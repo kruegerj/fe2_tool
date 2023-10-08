@@ -1,0 +1,3 @@
+mongodb:
+  "database": "de_alamos_fe2"
+  "collection": "user"
